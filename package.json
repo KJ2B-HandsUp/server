@@ -2,13 +2,21 @@
   "name": "namanmoo",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "app.js",
+  "type": "module",
   "scripts": {
+    "start": "nodemon server/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "httpolyglot": "^0.1.2",
+    "mediasoup": "^3.12.6",
+    "mediasoup-client": "^3.6.98",
+    "nodemon": "^3.0.1",
+    "socket.io": "^4.7.1",
+    "socket.io-client": "^4.7.1"
   }
 }
