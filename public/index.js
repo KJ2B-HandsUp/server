@@ -52,7 +52,8 @@ let videoParams = { params };
 let consumingTransports = [];
 
 const streamSuccess = (stream) => {
-    localVideo.srcObject = stream
+    const localVideo = document.getElementById('localVideo');
+    localVideo.srcObject = stream;
 
     audioParams = { track: stream.getAudioTracks()[0], ...audioParams };
     videoParams = { track: stream.getVideoTracks()[0], ...videoParams };
