@@ -105,6 +105,7 @@ connections.on("connection", async socket => {
     });
 
     socket.on("joinRoom", async ({ roomName }, callback) => {
+        console.log(roomName);
         const router1 = await createRoom(roomName, socket.id);
 
         peers[socket.id] = {
