@@ -6,6 +6,18 @@
     <title>Document</title>
 </head>
 <body>
+    <div id="create">
+    <input id="roomNameInput" placeholder="roomname",required,type="text" >
+    <button id="button">create</button></div>
+    <script>
+        const button = document.getElementById("button");
+        button.addEventListener("click", () => {
+            const roomname = document.getElementById("roomNameInput").value;
+            window.location.href = `/sfu/${roomname}`;
+        });
+    </script>
+    
+
     <div id="roomInfo"></div>
     <script>
         async function fetchRoomData(){
@@ -21,29 +33,26 @@
         }
         async function displayRoomInfo(){
             const data= await fetchRoomData();
+            let roomInfoHTML="";
             if(data){
                 for(const list of data ){
                     const roomname = list.roomname;
                     const peersnumber = list.peersnumber;
-                    const roomInfoHTML = ` 
-                    <p><strong>Room Name:</strong> ${roomname}</p>
+                    roomInfoHTML += ` 
+                    <p><strong>방 이름:</strong> ${roomname}</p>
                     <p><strong>Number of Peers:</strong> ${peersnumber}</p>
+                    <button onclick='button_join(${roomname})'>join</button>
                     `;
-                    const roomInfoContainer = document.getElementById("roomInfo");
-                    roomInfoContainer.innerHTML = roomInfoHTML;
-                }                
+                    
+                }
+                const roomInfoContainer = document.getElementById("roomInfo");
+                roomInfoContainer.innerHTML = roomInfoHTML;                
             }
         }
+        function button_join(roomname){
+            window.location.href = `/sfu/${roomname}`;
+        }
         displayRoomInfo();
-    </script>
-    <button id="button_join">join</button>
-    <button id="button_create">create</button>
-    
-    <script>
-        const button_join = document.getElementById("button_join");
-        button_join.addEventListener("click", () => {
-            window.location.href = "/sfu/:room";
-        });
     </script>
 
     <script>

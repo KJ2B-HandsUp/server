@@ -12,9 +12,9 @@ import mediasoup, { getSupportedRtpCapabilities } from 'mediasoup';
 const __dirname = path.resolve();
 const app = express();
 //클라이언트 사이드 랜더링 방법(CSR)
-app.get("/sfu/",(req,res)=>{
-    res.sendFile(path.join(__dirname,"public/create.html"));
-});
+// app.get("/sfu/",(req,res)=>{
+//     res.sendFile(path.join(__dirname,"public/create.html"));
+// });
 
 app.get("/api/rooms",(req,res)=>{ //rooms 정보
     if(Object.keys(rooms).length ===0){
@@ -399,9 +399,9 @@ const createWebRtcTransport = async (router) => {
             const webRtcTransport_options = {
                 listenIps: [
                     {
-                        ip: '172.31.5.109', //0.0.0.0 replace with relevant IP address
+                        ip: '0.0.0.0', //172.31.5.109 replace with relevant IP address
 
-                        announcedIp: '43.201.47.117',//127.0.0.1
+                        announcedIp: '127.0.0.1',//43.201.47.117
                     }
                 ],
                 enableUdp: true,
