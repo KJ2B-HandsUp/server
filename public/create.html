@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <input id="roomNameInput" placeholder="roomname",required,type="text" >
+    <button id="button">create</button>
+    <script>
+        const button = document.getElementById("button");
+        button.addEventListener("click", () => {
+            const roomname = document.getElementById("roomNameInput").value;
+            window.location.href = `/sfu/${roomname}`;
+        });
+    </script>
+</body>
+</html>

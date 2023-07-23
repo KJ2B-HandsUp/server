@@ -7,18 +7,46 @@ import fs from "fs";
 import path from "path";
 import mediasoup, { getSupportedRtpCapabilities } from 'mediasoup';
 
+
+
 const __dirname = path.resolve();
 const app = express();
-
-app.get('*', (req, res, next) => {
-    const path = "/sfu/";
-
-    if (req.path.indexOf(path) == 0 && req.path.length > path.length) return next();
-    
-    res.send(`You need to specify a room name in the path e.g. 'http://127.0.0.1/sfu/room'`);
+//클라이언트 사이드 랜더링 방법(CSR)
+app.get("/sfu/",(req,res)=>{
+    res.sendFile(path.join(__dirname,"public/create.html"));
 });
 
+app.get("/api/rooms",(req,res)=>{
+    // if(Object.keys(rooms).length ===0){
+    //     res.json(rooms);
+    // }
+    // else{
+    //     const roomname = Object.keys(rooms)[0];
+    //     const peersnumber = rooms[roomname]?.router._eventsCount;
+    //     const peers= rooms[roomname]?.peers;
+    //     const newJSON = {
+    //         roomname : roomname,
+    //         peersnumber : peersnumber,
+    //         peers : peers
+    //     };
+    //     res.json(newJSON);
+    // }
+    res.json(rooms);
+});
+
+app.get('*', (req, res, next) => {
+    const sfupath = "/sfu/";
+
+    if (req.path.indexOf(sfupath) == 0 && req.path.length > sfupath.length) return next();
+    res.sendFile(path.join(__dirname,"public/main.html"));
+   
+    // res.send(`You need to specify a room name in the path e.g. 'http://127.0.0.1/sfu/room'`);
+});
+
+
 app.use("/sfu/:room", express.static(path.join(__dirname, "public")));
+
+
 
 // 서버, mediasoup 설정
 const httpServer = http.createServer(app);
@@ -35,6 +63,8 @@ let peers = {};
 let transports = [];
 let producers = [];
 let consumers = [];
+
+
 
 // Worker 생성 함수
 const createWorker = async () => {
@@ -77,6 +107,9 @@ connections.on("connection", async socket => {
     socket.emit("connection-success", {
         socketId: socket.id,
     });
+    //클라이언트한테 roomName 전달
+    // socket.emit("rooms",rooms[roomName]);
+    console.log(rooms);
 
     const removeItems = (items, socketId, type) => {
         items.forEach(item => {
@@ -143,6 +176,9 @@ connections.on("connection", async socket => {
             peers: [...peers, socketId],
         }
 
+        
+
+        console.log(rooms);
         return router1;
     }
     // transport 생성
@@ -352,9 +388,9 @@ const createWebRtcTransport = async (router) => {
             const webRtcTransport_options = {
                 listenIps: [
                     {
-                        ip: '172.31.5.109', // replace with relevant IP address
+                        ip: '0.0.0.0', // 172.31.5.109replace with relevant IP address
 
-                        announcedIp: '43.201.47.117',
+                        announcedIp: '127.0.0.1',//43.201.47.117
                     }
                 ],
                 enableUdp: true,

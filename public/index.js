@@ -11,6 +11,8 @@ socket.on('connection-success', ({ socketId }) => {
     getLocalStream()
 })
 
+
+
 let device
 let rtpCapabilities
 let producerTransport
