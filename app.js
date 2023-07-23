@@ -16,22 +16,26 @@ app.get("/sfu/",(req,res)=>{
     res.sendFile(path.join(__dirname,"public/create.html"));
 });
 
-app.get("/api/rooms",(req,res)=>{
-    // if(Object.keys(rooms).length ===0){
-    //     res.json(rooms);
-    // }
-    // else{
-    //     const roomname = Object.keys(rooms)[0];
-    //     const peersnumber = rooms[roomname]?.router._eventsCount;
-    //     const peers= rooms[roomname]?.peers;
-    //     const newJSON = {
-    //         roomname : roomname,
-    //         peersnumber : peersnumber,
-    //         peers : peers
-    //     };
-    //     res.json(newJSON);
-    // }
-    res.json(rooms);
+app.get("/api/rooms",(req,res)=>{ //rooms 정보
+    if(Object.keys(rooms).length ===0){
+        res.json(rooms);
+    }
+    else{
+        const roomnames = Object.keys(rooms);
+        const newJSONArray=[];
+        for(const roomname of roomnames){
+            const peersnumber = rooms[roomname]?.router._eventsCount;
+            const peers= rooms[roomname]?.peers;
+            const newJSON = {
+                roomname : roomname,
+                peersnumber : peersnumber,
+                peers : peers
+            };
+            newJSONArray.push(newJSON);
+        }
+        res.json(newJSONArray);
+    }
+    // res.json(rooms);
 });
 
 app.get('*', (req, res, next) => {
