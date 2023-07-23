@@ -50,8 +50,6 @@ app.get('*', (req, res, next) => {
 
 app.use("/sfu/:room", express.static(path.join(__dirname, "public")));
 
-
-
 // 서버, mediasoup 설정
 const httpServer = http.createServer(app);
 httpServer.listen(3000, () => {
@@ -68,9 +66,10 @@ let transports = [];
 let producers = [];
 let consumers = [];
 
-
-
 // Worker 생성 함수
+
+
+
 const createWorker = async () => {
     worker = await mediasoup.createWorker({
         rtcMinPort: 2000,
