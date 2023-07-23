@@ -24,8 +24,8 @@ app.get("/api/rooms",(req,res)=>{ //rooms 정보
         const roomnames = Object.keys(rooms);
         const newJSONArray=[];
         for(const roomname of roomnames){
-            const peersnumber = rooms[roomname]?.router._eventsCount;
             const peers= rooms[roomname]?.peers;
+            const peersnumber = peers.length;
             const newJSON = {
                 roomname : roomname,
                 peersnumber : peersnumber,
@@ -134,10 +134,20 @@ connections.on("connection", async socket => {
         const { roomName } = peers[socket.id];
         delete peers[socket.id];
 
+        const roomnames = Object.keys(rooms);
+        
         rooms[roomName] = {
             router: rooms[roomName].router,
             peers: rooms[roomName].peers.filter(socketId => socketId !== socket.id)
         }
+        //peers가 0명일시 방 삭제
+        for(const roomname of roomnames){
+            const peersnumber = rooms[roomname]?.peers.length;
+            if(peersnumber==0){
+                delete rooms[roomname];
+            }
+        }
+        console.log(rooms);
     });
 
     socket.on("joinRoom", async ({ roomName }, callback) => {
@@ -385,8 +395,6 @@ connections.on("connection", async socket => {
 
 const createWebRtcTransport = async (router) => {
     return new Promise(async (resolve, reject) => {
-        
-    
         try {
             const webRtcTransport_options = {
                 listenIps: [

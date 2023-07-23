@@ -6,6 +6,36 @@
     <title>Document</title>
 </head>
 <body>
+    <div id="roomInfo"></div>
+    <script>
+        async function fetchRoomData(){
+            try{
+                const response = await fetch("/api/rooms");
+                const data = await response.json();
+                return data;
+            }
+            catch(error){
+                console.error("error fetching room data:", error);
+                return null;
+            }
+        }
+        async function displayRoomInfo(){
+            const data= await fetchRoomData();
+            if(data){
+                for(const list of data ){
+                    const roomname = list.roomname;
+                    const peersnumber = list.peersnumber;
+                    const roomInfoHTML = ` 
+                    <p><strong>Room Name:</strong> ${roomname}</p>
+                    <p><strong>Number of Peers:</strong> ${peersnumber}</p>
+                    `;
+                    const roomInfoContainer = document.getElementById("roomInfo");
+                    roomInfoContainer.innerHTML = roomInfoHTML;
+                }                
+            }
+        }
+        displayRoomInfo();
+    </script>
     <button id="button_join">join</button>
     <button id="button_create">create</button>
     
