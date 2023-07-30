@@ -1,19 +1,16 @@
 import express from "express";
 import { Server } from "socket.io";
 import http from "http";
-import fs from "fs";
 import path from "path";
-import mediasoup, { getSupportedRtpCapabilities } from 'mediasoup';
+import mediasoup from 'mediasoup';
 import bodyParser from 'body-parser'; 
 
 const __dirname = path.resolve();
 const app = express();
 
-app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
     res.sendFile(__dirname + "/public/views/home.html");
@@ -26,7 +23,6 @@ app.get('/testdata', (req, res) => {
 app.post("/testdata2", (req, res) => {
     const type = req.body;
     gameMode = type["selectedValue"];
-    console.log("type from client: ", gameMode);
 })
 
 app.use("/room/:roomName", express.static(path.join(__dirname, "public")));
@@ -40,12 +36,12 @@ const io = new Server(httpServer);
 const connections = io.of("/mediasoup");
 
 let worker;
+let workers = [];
 let rooms = {};
 let peers = {};
 let transports = [];
 let producers = [];
 let consumers = [];
-let checkRoom = {};
 let gameMode;
 
 // Worker 생성 함수
@@ -60,32 +56,30 @@ const createWorker = async () => {
         console.error("mediasoup worker has died");
         setTimeout(() => process.exit(1), 2000);
     })
+    worker.using = false;
+    workers.push(worker);
     return worker;
 }
 // mediasoup worker 생성
-worker = createWorker();
+for (let i = 0; i < 4; i++){
+    createWorker();
+}
 
 // 사용할 오디오 및 비디오 코덱 정의
 const mediaCodecs = [
-    {
-        kind: "audio",
-        mimeType: "audio/opus",
-        clockRate: 48000,
-        channels: 2,
-    },
     {
         kind: "video",
         mimeType: "video/VP8",
         clockRate: 90000,
         parameters: {
-            "x-google-start-bitrate": 1000,
+            "x-google-start-bitrate": 300,
         },
     },
 ];
 
 // peers 객체에서 소켓을 이용한 이벤트 처리
 connections.on("connection", async socket => {
-    console.log(socket.id);
+    console.log("Socket ID:", socket.id);
     socket.emit("connection-success", {
         socketId: socket.id,
     });
@@ -106,20 +100,27 @@ connections.on("connection", async socket => {
         consumers = removeItems(consumers, socket.id, "consumer");
         producers = removeItems(producers, socket.id, "producer");
         transports = removeItems(transports, socket.id, "transport");
-
+        if (!peers[socket.id]) {
+            return;
+        } 
         const { roomName } = peers[socket.id];
 
         if (roomName && rooms[roomName]) {
             rooms[roomName].peers = rooms[roomName].peers.filter(socketId => socketId !== socket.id);
             for (const room in rooms) {
                 if (rooms[room].peers.length === 0) {
-                    delete rooms[room];
+                    for (const workerRoom of workers) {
+                        if (workerRoom.using === roomName) {
+                            console.log("사용 중인 worker 초기화");
+                            workerRoom.using = false;
+                            delete rooms[room];
+                            break;
+                        }
+                    }
                 }
             }
         }
         delete peers[socket.id];
-
-        console.log(rooms);
     });
 
     socket.on("joinRoom", async ({ roomName }, callback) => {
@@ -144,7 +145,6 @@ connections.on("connection", async socket => {
 
             console.log(`방 이름 : ${name}, 참여 인원 : ${roomLen} 명`);
         }
-        console.log();
 
         const rtpCapabilities = router1.rtpCapabilities;
 
@@ -167,7 +167,17 @@ connections.on("connection", async socket => {
                 roomType: rooms[roomName].roomType
             }
         } else {
-            router1 = await worker.createRouter({ mediaCodecs, });
+            for (const worker of workers) {
+                if (!worker.using) {
+                    worker.using = roomName;
+                    
+                    router1 = await worker.createRouter({ mediaCodecs, });
+                    router1["usingRoom"] = roomName;
+                    console.log(router1.id);
+                    break;
+                }
+            }
+
             rooms[roomName] = {
                 router: router1,
                 peers: [...peers, socketId],
@@ -175,9 +185,7 @@ connections.on("connection", async socket => {
             }
         }
 
-        console.log(`Router ID: ${router1.id}`, peers.length);
-
-        
+        console.log(`Router ID: ${router1.id}`);
 
         return router1;
     }
@@ -286,7 +294,6 @@ connections.on("connection", async socket => {
         getTransport(socket.id).connect({ dtlsParameters });
     })
 
-    // 
     socket.on("transport-produce", async ({ kind, rtpParameters, appData }, callback) => {
         const producer = await getTransport(socket.id).produce({
             kind,
@@ -386,9 +393,9 @@ const createWebRtcTransport = async (router) => {
             const webRtcTransport_options = {
                 listenIps: [
                     {
-                        ip: '0.0.0.0', // replace with relevant IP address
+                        ip: '172.31.5.109', // replace with relevant IP address
 
-                        announcedIp: '127.0.0.1',
+                        announcedIp: '43.201.47.117',
                     }
                 ],
                 enableUdp: true,
