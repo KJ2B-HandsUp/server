@@ -3,10 +3,13 @@ import { Server } from "socket.io";
 import http from "http";
 import path from "path";
 import mediasoup from 'mediasoup';
-import bodyParser from 'body-parser'; 
+import bodyParser from 'body-parser';
+import cors from 'cors';
 
 const __dirname = path.resolve();
 const app = express();
+
+app.use(cors())
 
 app.use(express.json());
 
@@ -32,7 +35,12 @@ const httpServer = http.createServer(app);
 httpServer.listen(3000, () => {
     console.log("Listening on port: http://localhost:3000");
 });
-const io = new Server(httpServer);
+const io = new Server(httpServer, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
+    }
+});
 const connections = io.of("/mediasoup");
 
 let worker;
