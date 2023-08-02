@@ -68,6 +68,7 @@ const createWorker = async () => {
     return worker;
 }
 
+console.log(os.cpus().length);
 // Worker 생성
 for (let i = 0; i < os.cpus().length / 2; i++) {
     createWorker();
