@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" , href="https://unpkg.com/mvp.css">
+    <link rel="stylesheet" href="csstest.css" type="text/css" />
+    <title>Room</title>
+    <style>
+        #createForm {
+            margin: 0px auto;
+            width: 400px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg">
+        <button onclick="location.href='/main'">Main</button>
+        <!-- <video muted autoplay loop>
+            <source src="back.mp4" type="video/mp4">
+        </video> -->
+        <div id="createForm">
+            <form id="createRoom">
+                <input type="text" , placeholder="Room Name" , required>
+                <select name="first" id="second">
+                    <option value="game1">game1</option>
+                    <option value="game2">game2</option>
+                    <option value="game3">game3</option>
+                </select>
+                <button>Create Room</button>
+            </form>
+        </div>
+        <div id="dataContainer"></div>
+    </div>
+
+    <script>
+        const createRoomForm = document.getElementById("createRoom");
+
+        // data 가져오기
+        const fetchData = (url) => {
+            return fetch(url)
+                .then(response => response.json())
+                .catch(error => {
+                    console.log(error);
+                })
+        }
+
+        // 방 새로고침
+        const refreshRooms = (url) => {
+            fetchData(url)
+                .then(data => {
+                    let rooms = '';
+                    for (const room in data) {
+                        let gameMode;
+                        switch (data[room]["roomType"]) {
+                            case "game1":
+                                gameMode = 4;
+                                break;
+                            case "game2":
+                                gameMode = 2;
+                                break;
+                            case "game3":
+                                gameMode = 1;
+                                break;
+                        }
+                        console.log(data[room]["roomType"]);
+                        rooms += `<div class="room">방 이름 : ${room} (접속 인원 : ${data[room].peers.length} 명 / 최대 ${gameMode} 명)<br>`;
+                        rooms += `<button onclick="goToRoom('${room}','${data[room].peers.length}','${gameMode}')">Join</button><br></div>`;
+                    }
+                    document.getElementById('dataContainer').innerHTML = rooms;
+                }).catch(error => {
+                    console.error('데이터 오류:', error);
+                });
+        }
+
+        const handleCreateBtnClick = async (event) => {
+            event.preventDefault();
+            const input = createRoomForm.querySelector("input");
+            let content = input.value;
+            let check = false;
+
+            await fetchData("/testdata")
+                .then(data => {
+                    for (const room in data) {
+                        if (room === content) {
+                            alert("동일한 이름의 방이 존재합니다.");
+                            check = true;
+                            break;
+                        }
+                    }
+                })
+
+            if (check) return; // 동일한 방 체크
+
+            const selectElement = document.getElementById('second');
+
+            // 선택된 옵션의 value 값 가져오기
+            const selectedValue = selectElement.value;
+
+            alert(`Room: ${content}(Type: ${selectedValue}) created!`);
+            sendData({ selectedValue });
+            window.location.href = `/room/${content}`;
+        }
+
+        const sendData = (type) => {
+            const apiUrl = "/testdata2";
+
+            fetch(apiUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(type)
+            })
+                .catch(error => {
+                    console.error("data error:", error);
+                })
+        }
+
+        const goToRoom = async (room, currentlen, gameMode) => {
+            // 해당 방으로 이동합니다.
+            if (currentlen === gameMode) {
+                alert("방이 꽉 찼습니다");
+            }
+            else {
+                window.location.href = `/room/${room}`;
+            }
+        }
+
+        refreshRooms("/testdata");
+
+        createRoomForm.addEventListener("submit", handleCreateBtnClick);
+    </script>
+</body>
+
+</html>

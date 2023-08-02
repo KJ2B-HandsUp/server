@@ -1,0 +1,93 @@
+
+
+.milky {
+    font-family: "establishRetrosansOTF";
+    text-transform: uppercase;
+    display: block;
+    font-size: 92px;
+    color: #ffffffce;
+    text-shadow: 0 8px 9px #010300, 0px -2px 1px #ffffff;
+    font-weight: bold;
+    letter-spacing: -4px;
+    text-align: center;
+    /* background: linear-gradient(to bottom, #ece4d9 0%, #e9dfd1 100%); */
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 20px;
+}
+
+body,
+html {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.hov {
+    margin: 20px;
+    color: #ffffff;
+    display: inline-block;
+    cursor: pointer;
+    font-size: 5vmin;
+    font-weight: 300;
+    transition: font-weight 200ms ease-in-out;
+}
+
+.hov:hover {
+    color: rgb(25, 255, 94);
+    
+    font-weight: 1000;
+    font-size: 6vmin;
+}
+/* 
+body {
+    padding: 0px;
+    margin: 0px;
+} */
+
+.bg {
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    /* margin: 0px auto; */
+    position: relative;
+}
+
+video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    /* 부모 요소를 기준으로 위치하도록 설정 */
+    top: 0;
+    left: 0;
+}
+
+@font-face {
+    font-family: 'establishRetrosansOTF';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2112@1.0/establishRetrosansOTF.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+.text {
+    font-family: "establishRetrosansOTF";
+    position: absolute;
+    width: 100%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-shadow: 0 8px 9px #010300, 0px -2px 1px #ffffff;
+}
+
+.text p {
+    text-align: center;
+    font-size: 48px;
+    color: #ffffff;
+}
+
+.buttons {
+    text-align: center;
+}
