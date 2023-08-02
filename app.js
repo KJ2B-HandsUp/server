@@ -8,7 +8,6 @@ import cors from "cors";
 import routes from "./routers/router.js";
 import { config } from 'dotenv';
 import AWS from 'aws-sdk';
-import os from "os";
 
 config();
 
@@ -68,9 +67,8 @@ const createWorker = async () => {
     return worker;
 }
 
-console.log(os.cpus().length);
 // Worker 생성
-for (let i = 0; i < os.cpus().length / 2; i++) {
+for (let i = 0; i < 4; i++) {
     createWorker();
 }
 
