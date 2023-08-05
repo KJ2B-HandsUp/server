@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" , href="https://unpkg.com/mvp.css">
     <link rel="stylesheet" href="csstest.css" type="text/css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <title>Room</title>
     <style>
         #createForm {
@@ -16,24 +17,20 @@
 </head>
 
 <body>
-    <div class="bg">
-        <button onclick="location.href='/main'">Main</button>
-        <!-- <video muted autoplay loop>
-            <source src="back.mp4" type="video/mp4">
-        </video> -->
-        <div id="createForm">
-            <form id="createRoom">
-                <input type="text" , placeholder="Room Name" , required>
-                <select name="first" id="second">
-                    <option value="game1">game1</option>
-                    <option value="game2">game2</option>
-                    <option value="game3">game3</option>
-                </select>
-                <button>Create Room</button>
-            </form>
-        </div>
-        <div id="dataContainer"></div>
+    <button onclick="location.href='/main'">Main</button>
+    <div id="createForm">
+        <form id="createRoom">
+            <input type="text" , placeholder="Room Name" , required>
+            <select name="first" id="second">
+                <option value="game1">game1</option>
+                <option value="game2">game2</option>
+                <option value="game3">game3</option>
+            </select>
+            <button class="FancyButton createRoom">Create</button>
+        </form>
     </div>
+    <div id="dataContainer"></div>
+
 
     <script>
         const createRoomForm = document.getElementById("createRoom");
@@ -134,5 +131,9 @@
         createRoomForm.addEventListener("submit", handleCreateBtnClick);
     </script>
 </body>
+
+<footer>
+    <script src="index.js"></script>
+</footer>
 
 </html>

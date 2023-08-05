@@ -1,93 +1,72 @@
-
-
-.milky {
-    font-family: "establishRetrosansOTF";
-    text-transform: uppercase;
-    display: block;
-    font-size: 92px;
-    color: #ffffffce;
-    text-shadow: 0 8px 9px #010300, 0px -2px 1px #ffffff;
-    font-weight: bold;
-    letter-spacing: -4px;
-    text-align: center;
-    /* background: linear-gradient(to bottom, #ece4d9 0%, #e9dfd1 100%); */
-    position: absolute;
-    top: 10%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    border-radius: 20px;
-}
-
-body,
-html {
-    height: 100%;
-    width: 100%;
-    margin: 0;
-    padding: 0;
-}
-
-.hov {
-    margin: 20px;
-    color: #ffffff;
-    display: inline-block;
-    cursor: pointer;
-    font-size: 5vmin;
-    font-weight: 300;
-    transition: font-weight 200ms ease-in-out;
-}
-
-.hov:hover {
-    color: rgb(25, 255, 94);
-    
-    font-weight: 1000;
-    font-size: 6vmin;
-}
-/* 
 body {
-    padding: 0px;
-    margin: 0px;
-} */
-
-.bg {
-    width: 100%;
-    height: 100vh;
-    overflow: hidden;
-    /* margin: 0px auto; */
-    position: relative;
+    background-color: #f7dddd;
 }
 
-video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+* {
+    box-sizing: border-box;
+}
+
+.FancyButton {
+    --perX: 50%;
+    --perY: 50%;
+    font-family: 'Play', sans-serif;
+    letter-spacing: .05em;
+    position: relative;
+    color: #78a;
+    text-decoration: none;
+    padding: 0.5em 0.5em;
+    font-size: 2em;
+    transition: color .5s, background-color .5s, box-shadow .5s, transform 0.1s;
+    background-color: #234;
+    background-image:
+        linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0)),
+        radial-gradient(100% 2.5% at 50% 0%, rgba(38, 102, 255, 0.2), rgba(38, 102, 255, 0)),
+        radial-gradient(100% 2.5% at 50% 100%, rgba(38, 102, 255, 0.2), rgba(38, 102, 255, 0));
+    border-radius: 0.2em;
+    overflow: hidden;
+}
+
+.FancyButton::before {
+    content: '';
+    display: block;
     position: absolute;
-    /* 부모 요소를 기준으로 위치하도록 설정 */
     top: 0;
     left: 0;
-}
-
-@font-face {
-    font-family: 'establishRetrosansOTF';
-    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2112@1.0/establishRetrosansOTF.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-}
-.text {
-    font-family: "establishRetrosansOTF";
-    position: absolute;
     width: 100%;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-shadow: 0 8px 9px #010300, 0px -2px 1px #ffffff;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 1s;
+    background-image:
+        radial-gradient(50% 80% at var(--perX) 0%, rgba(38, 102, 255, 0.3), rgba(38, 102, 255, 0)),
+        radial-gradient(50% 80% at var(--perX) 100%, rgba(38, 102, 255, 0.3), rgba(38, 102, 255, 0)),
+        radial-gradient(40% 200% at var(--perX) 50%, rgba(38, 102, 255, 0.2), rgba(38, 102, 255, 0)),
+        radial-gradient(50% 2% at var(--perX) 0%, rgba(38, 102, 255, 1), rgba(38, 102, 255, 0)),
+        radial-gradient(50% 2% at var(--perX) 100%, rgba(38, 102, 255, 1), rgba(38, 102, 255, 0)),
+        radial-gradient(50% 2% at var(--perX) 0%, rgba(38, 102, 255, 1), rgba(38, 102, 255, 0)),
+        radial-gradient(50% 2% at var(--perX) 100%, rgba(38, 102, 255, 1), rgba(38, 102, 255, 0));
+    mix-blend-mode: screen;
 }
 
-.text p {
-    text-align: center;
-    font-size: 48px;
-    color: #ffffff;
+.FancyButton:hover {
+    color: #acf;
+    background-color: #236;
+    box-shadow: inset rgba(38, 102, 255, 0.2) 0px 0px 0.6em 1px, rgba(38, 102, 255, 0.2) 0px 0px 1.2em 3px;
 }
 
-.buttons {
-    text-align: center;
+.FancyButton:hover::before {
+    opacity: 1;
+}
+
+.FancyButton:active {
+    transform: translateY(2.5%);
+}
+
+button {
+    border: 0;
+}
+
+.createRoom {
+    width: 200px;
+    height: 100px;
+    /* text-align: center; */
 }

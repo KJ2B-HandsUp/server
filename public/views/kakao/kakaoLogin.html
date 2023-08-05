@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="kr">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Kakao REST-API Node.js example</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+
+<body>
+    <h1>1. 카카오 로그인 및 프로필 조회 예제</h1>
+    <pre>
+- [KOE101, KOE004] 내 애플리케이션>제품 설정>카카오 로그인 > 활성화 설정 : ON
+- [KOE006] 내 애플리케이션>제품 설정>카카오 로그인 > Redirect URI : http://localhost:4000/redirect
+</pre>
+    <div class="text-center">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script>
+            
+            // axios.get('http://localhost:4000' + '/profile', { params: {}, withCredentials: true })
+            //         .then(({ data }) => {
+                        
+            //             console.log(data.properties.thumbnail_image);
+            //             document.getElementById("thumbnail").src=data.properties.thumbnail_image;
+            //             console.log(data); $('#contents').html(JSON.stringify(data)); 
+            //         })
+            //         .catch(err => {
+            //             console.log(err); $('#contents').html(JSON.stringify(err)); 
+            //         });
+
+            // changeImage();
+            function REST_Call(path) {
+
+                axios.get('http://localhost:3000' + path, { params: {}, withCredentials: true })
+                    .then(({ data }) => {
+                        console.log(data); $('#contents').html(JSON.stringify(data)); 
+                    })
+                    .catch(err => {
+                        console.log(err); $('#contents').html(JSON.stringify(err)); 
+                    });
+
+            }
+
+        </script>
+        <a href="http://localhost:3000/authorize">
+            <!-- 여기는 그냥 이미지만 있고, 결국 http://localhost:4000/authorize로 보내서 여기서 카카오에서 인가코드를 받아서 그걸 url에 붙여서 /redirect 라는 주소로 리다이렉트 시켜서 거기서 엑세스 토큰과 리프레시 토큰을 발급받는 형태로 보여진다. -->
+            <img src="//k.kakaocdn.net/14/dn/btqCn0WEmI3/nijroPfbpCa4at5EIsjyf0/o.jpg" width="222" />
+        </a><br />
+
+        <button onclick="REST_Call('/profile')">프로필 조회 </button><br />
+
+        <textarea id="contents" rows='20' cols='100'></textarea><br />
+
+        
+        <img id="thumbnail" src="" alt="thumnail Image">
+    </div>
+
+</body>
+
+</html>

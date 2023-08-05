@@ -10,7 +10,6 @@
     font-weight: bold;
     letter-spacing: -4px;
     text-align: center;
-    /* background: linear-gradient(to bottom, #ece4d9 0%, #e9dfd1 100%); */
     position: absolute;
     top: 10%;
     left: 50%;
@@ -42,17 +41,11 @@ html {
     font-weight: 1000;
     font-size: 6vmin;
 }
-/* 
-body {
-    padding: 0px;
-    margin: 0px;
-} */
 
 .bg {
     width: 100%;
     height: 100vh;
     overflow: hidden;
-    /* margin: 0px auto; */
     position: relative;
 }
 
@@ -61,7 +54,6 @@ video {
     height: 100%;
     object-fit: cover;
     position: absolute;
-    /* 부모 요소를 기준으로 위치하도록 설정 */
     top: 0;
     left: 0;
 }

@@ -7,7 +7,7 @@ config();
 const router = express.Router();
 const __dirname = path.resolve();
 
-export default function createRoutes(rooms,gameMode){
+export default function createRoutes(rooms, gameMode){
     router.use("/", express.static(path.join(__dirname, "public/views/login")));
     router.use("/home", express.static(path.join(__dirname, "public/views/home")));
     router.use("/main", express.static(path.join(__dirname, "public/views/main")));

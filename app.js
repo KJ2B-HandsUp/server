@@ -8,8 +8,18 @@ import cors from "cors";
 import routes from "./routers/router.js";
 import { config } from 'dotenv';
 import AWS from 'aws-sdk';
+import qs from "qs";
+import axios from "axios";
+import session from "express-session";
 
-config();
+// config();
+
+// AWS SDK를 DynamoDB Local에 연결하기 위해 endpoint를 설정합니다.
+AWS.config.update({
+    region: "ap-northeast-2", // 지역(region)은 local로 설정합니다.
+    accessKeyId: "AKIAQAOWDSHMLK33KPPE", // 로컬 환경에서 더미(dummy) 액세스 키를 사용합니다.
+    secretAccessKey: "bw1SZ0f00X02nJV4mYJycYgOaUyCJs9B/rD+YI7f", // 로컬 환경에서 더미(dummy) 시크릿 액세스 키를 사용합니다.
+});
 
 //변수 설정
 let worker;
@@ -21,12 +31,28 @@ let consumers = [];
 let gameMode;
 let rooms = {};
 
+// 로그인 추가
+const client_id = 'd6fa349547eacf261bb84a056266706d';
+const redirect_uri = 'http://localhost:3000/redirect';
+const token_uri = 'https://kauth.kakao.com/oauth/token';
+const api_host = "https://kapi.kakao.com";
+const client_secret = '';
+const docClient = new AWS.DynamoDB.DocumentClient();
+
 const __dirname = path.resolve();
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 app.use(bodyParser.json());
+
+// 로그인
+app.use(session({
+    secret: 'your session secret',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false }
+}));
 app.use("/", routes(rooms, gameMode));
 app.post("/testdata2", (req, res) => {
     const type = req.body;
@@ -45,6 +71,144 @@ const io = new Server(httpServer, {
         origin: "*"
     }
 });
+
+// 로컬 DynamoDB에 데이터를 추가하는 예제 함수
+async function addItem(tableName, id_val, email_val) {
+    const params = {
+        TableName: tableName, // 로컬 DynamoDB 테이블 이름 (테이블은 미리 생성되어 있어야 합니다)
+        Item: {
+            user_id: id_val,
+            user_email: email_val // 기본 키 필드 (해당 테이블의 기본 키에 맞게 설정해야 합니다)
+        },
+    };
+    try {
+        await docClient.put(params).promise();
+        console.log("Item added successfully!");
+        return true;
+    } catch (err) {
+        console.error("Error adding item:", err);
+        return false;
+    }
+}
+
+// 로컬 DynamoDB에 데이터를 조회하는 예제 함수
+async function getItem(tableName, id_val, email_val) {
+    const params = {
+        TableName: tableName,
+        Key: {
+            user_id: id_val,
+            user_email: email_val,
+        },
+    };
+    try {
+        const data = await docClient.get(params).promise();
+
+        console.log("Item retrieved successfully:", data.Item);
+
+        return true;
+    } catch (err) {
+        console.error("Error getting item:", err);
+
+        return false;
+    }
+}
+
+app.get('/kakaoLogin', (req, res) => {
+    res.sendFile(__dirname + "/public/views/kakao/kakaoLogin.html");
+});
+
+// 확인받는 단계?
+app.get('/authorize', (req, res) => {
+    let { scope } = req.query;
+    var scopeParam = "";
+    if (scope) {
+        scopeParam = "&scope=" + scope;
+    }
+    res.status(302).redirect(`https://kauth.kakao.com/oauth/authorize?client_id=${client_id}&redirect_uri=${redirect_uri}&response_type=code${scopeParam}`);
+})
+
+// 유저 정보 받아오는 함수?
+const call = async (method, uri, param, header) => {
+    let rtn;
+    try {
+        rtn = await axios({
+            method: method,
+            url: uri,
+            headers: header,
+            data: param
+        })
+    } catch (err) {
+        rtn = err.response;
+    }
+    return rtn.data;
+}
+
+let user_id;
+let user_email;
+
+// 로그인 완료 후 
+app.get('/redirect', async (req, res) => {
+    const param = qs.stringify({
+        "grant_type": 'authorization_code',
+        "client_id": client_id,
+        "redirect_uri": redirect_uri,
+        "client_secret": client_secret,
+        "code": req.query.code
+    });
+
+    const header = { 'content-type': 'application/x-www-form-urlencoded' };
+    var rtn = await call('POST', token_uri, param, header);
+    req.session.key = rtn.access_token;
+    res.status(302).redirect(`http://localhost:3000`);
+    console.log(rtn);
+});
+
+// 프로필 조회
+app.get('/profile', async (req, res) => {
+    console.log("profile 눌렀음");
+    const uri = api_host + "/v2/user/me";
+    const param = {};
+    const header = {
+        'content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': 'Bearer ' + req.session.key
+    }
+    var rtn = await call('POST', uri, param, header);
+    res.send(rtn);
+})
+
+
+// 친구
+app.get('/friends', async (req, res) => {
+    const uri = api_host + "/v1/api/talk/friends";
+    const param = null;
+    const header = {
+        'Authorization': 'Bearer ' + req.session.key
+    }
+    var rtn = await call('GET', uri, param, header);
+    res.send(rtn);
+})
+
+// 문자보내기?
+app.get('/message', async (req, res) => {
+    const uri = api_host + "/v2/api/talk/memo/default/send";
+    const param = qs.stringify({
+        "template_object": '{' +
+            '"object_type": "text",' +
+            '"text": "텍스트 영역입니다. 최대 200자 표시 가능합니다.",' +
+            '"link": {' +
+            '    "web_url": "https://developers.kakao.com",' +
+            '    "mobile_web_url": "https://developers.kakao.com"' +
+            '},' +
+            '"button_title": "바로 확인"' +
+            '}'
+    });
+    const header = {
+        'content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': 'Bearer ' + req.session.key
+    }
+    var rtn = await call('POST', uri, param, header);
+    res.send(rtn);
+})
 
 // 소켓 선언
 const connections = io.of("/mediasoup");
