@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon",
-    "watch": "watchify public/index.js -o public/bundle.js -v"
+    "watch": "watchify public/views/room/index.js -o public/views/room/bundle.js -v"
   },
   "keywords": [],
   "author": "",
