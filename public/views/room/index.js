@@ -27,6 +27,8 @@ let rtpCapabilities
 let producerTransport
 let consumerTransports = []
 let videoProducer
+//🔊오디오
+let audioProducer
 
 let params = {
     // mediasoup params
@@ -42,12 +44,15 @@ let params = {
     }
 }
 
+let audioParams;
 let videoParams = { params };
 let consumingTransports = [];
 
 const streamSuccess = (stream) => {
     localVideo.srcObject = stream;
 
+    //🔊오디오
+    audioParams = { track: stream.getAudioTracks()[0], ...audioParams };
     videoParams = { track: stream.getVideoTracks()[0], ...videoParams };
     joinRoom()
 }
@@ -62,6 +67,8 @@ const joinRoom = () => {
 
 const getLocalStream = () => {
     navigator.mediaDevices.getUserMedia({
+        //🔊오디오
+        audio: true,
         video: {
             width: {
                 min: 640,
@@ -100,6 +107,8 @@ const createDevice = async () => {
 /*Send Transport를 생성하는 함수로 클라이언트 측에서 소켓 통신을 통해 서버에 send Transport생성을 요청하고, 
 서버로 부터 필요한 매개변수를 받아와 send Transport를 생성한다.*/
 const createSendTransport = () => { //
+
+
     socket.emit('createWebRtcTransport', { consumer: false }, ({ params }) => {
         if (params.error) {
             console.log(params.error)
@@ -146,8 +155,22 @@ const createSendTransport = () => { //
 }
 
 const connectSendTransport = async () => {
-   
+
+    //🔊오디오
+    audioProducer = await producerTransport.produce(audioParams);
     videoProducer = await producerTransport.produce(videoParams);
+
+    audioProducer.on('trackended', () => {
+        console.log('audio track ended')
+
+        // close audio track
+    })
+
+    audioProducer.on('transportclose', () => {
+        console.log('audio transport ended')
+
+        // close audio track
+    })
 
     videoProducer.on('trackended', () => {
         console.log('video track ended')
@@ -237,9 +260,13 @@ const connectRecvTransport = async (consumerTransport, remoteProducerId, serverC
         const newElem = document.createElement('div')
         newElem.setAttribute('id', `td-${remoteProducerId}`)
 
-        newElem.setAttribute('class', 'remoteVideo')
-        newElem.innerHTML = '<video id="' + remoteProducerId + '" autoplay class="video" ></video>'
-
+        if (params.kind == 'audio') {
+            //append to the audio container
+            newElem.innerHTML = '<audio id="' + remoteProducerId + '" autoplay></audio>'
+        } else {
+            newElem.setAttribute('class', 'remoteVideo')
+            newElem.innerHTML = '<video id="' + remoteProducerId + '" autoplay class="video" ></video>'
+        }
         videoContainer.appendChild(newElem)
 
         const { track } = consumer
