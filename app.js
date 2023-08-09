@@ -76,7 +76,7 @@ for (let i = 0; i < 4; i++) {
 const mediaCodecs = [
     {
         kind: "audio",
-        mimeType: "audio/opus",
+        mimeType: "audio/webm",
         clockRate: 48000,
         channels: 2,
     },
@@ -428,8 +428,8 @@ connections.on("connection", async socket => {
                 const webRtcTransport_options = {
                     listenIps: [
                         {
-                            ip: '172.31.5.109', // replace with relevant IP address
-                            announcedIp: '43.201.47.117',
+                            ip: '0.0.0.0', //172.31.5.109 replace with relevant IP address
+                            announcedIp: '127.0.0.1',//43.201.47.117
                         }
                     ],
                     enableUdp: true,
