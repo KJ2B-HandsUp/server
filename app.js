@@ -76,9 +76,9 @@ for (let i = 0; i < 4; i++) {
 const mediaCodecs = [
     {
         kind: "audio",
-        mimeType: "audio/PCMU",
-        clockRate: 8000,
-        channels: 1,
+        mimeType: "audio/opus",
+        clockRate: 48000,
+        channels: 2,
     },
     {
         kind: "video",
